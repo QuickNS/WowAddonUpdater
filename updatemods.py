@@ -1,8 +1,6 @@
-from utils.addon import Addon
-import requests
+from utils import Addon, CurseAddon, LegacyWowAddon, WowInterfaceAddon
 import os
-from bs4 import BeautifulSoup
-from urllib.request import urlopen 
+import zipfile
 
 # open file and read addons
 with open("list.txt", "r") as fp:
@@ -12,18 +10,38 @@ print()
 print("### LISTING ADDONS ###")
 print()
 
-addonList = [Addon(a) for a in addons]
+addonList = list()
+for a in addons:
+    if a.startswith("https://www.curseforge.com"):
+        addonList.append(CurseAddon(a))
+    elif a.startswith("https://legacy-wow.com/"):
+        addonList.append(LegacyWowAddon(a))
+    elif a.startswith("https://www.wowinterface.com"):
+        addonList.append(WowInterfaceAddon(a))
 
 for a in addonList:
-    print(a.url, a.type)
+    print(f"{a.name} - {a.type}")
 
 print()
 print(f"### TOTAL ADDONS: {len(addonList)} ###")
-print()
 
 # prepare output dir
-if not os.path.exists('AddOns'):
-    os.mkdir('Addons')
+if not os.path.exists('Packages'):
+    os.mkdir('Packages')
 
+# download all addons
 for addon in addonList:
     addon.download()
+
+# prepare Addons dir
+if not os.path.exists('Addons'):
+    os.mkdir('Addons')
+
+print(f"\n### DOWNLOADS COMPLETE ###\n")
+
+# unzip all addons
+for addon in addonList:
+    filename = os.path.join("Packages",addon.name + ".zip")
+    print("Extracting", filename)
+    with zipfile.ZipFile(filename, 'r') as zip_ref:
+        zip_ref.extractall("Addons")
