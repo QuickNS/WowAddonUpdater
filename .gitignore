@@ -1,3 +1,5 @@
 *.zip
 Addons/
 Packages/
+.pyc
+.vscode/
