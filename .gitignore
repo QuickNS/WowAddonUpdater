@@ -3,3 +3,4 @@ Addons/
 Packages/
 .pyc
 .vscode/
+__pycache__/
